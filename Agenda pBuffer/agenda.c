@@ -1,0 +1,79 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <crtdbg.h>
+
+//pessoa = char nome[10], int idade, char email[20];
+#define TAM_PESSOA (sizeof(char)*10 + sizeof(int) + sizeof(char)*20)
+
+void Adicionar(void *pBuffer);
+void Listar(void *pBuffer);
+
+int main() {
+    void *pBuffer, *temp;
+    
+    //pBuffer = int i, int qnt, int menu, char alvo[10]
+    pBuffer = malloc(sizeof(int)*3 + sizeof(char)*10);
+    if ( !pBuffer ) {
+        exit(1);
+    }
+
+    *((int *)pBuffer+1) = 0;
+
+    printf("--AGENDA PBUFFER MENU--\n");
+    for( ;; ) {
+        do {
+            printf("1. Adicionar pessoa\n");
+            printf("2. Remover pessoa\n");
+            printf("3. Buscar pessoa\n");
+            printf("4. Listar todas\n");
+            printf("5. Sair\n");
+            scanf("%d", (int *)pBuffer+2);
+        } while ( *((int *)pBuffer+2) > 5 || *((int *)pBuffer+2) < 1 );
+
+        switch( *((int *)pBuffer+2) ) {
+            case 1:
+                (*((int *)pBuffer+1))++;
+                temp = realloc(pBuffer, sizeof(int)*3 + sizeof(char)*10 + TAM_PESSOA*(*((int *)pBuffer+1)));
+                if ( !temp ) {
+                    exit(1);
+                } 
+                pBuffer = temp;
+                Adicionar(pBuffer);
+                break;
+            case 2:
+
+                break;
+            case 3:
+
+                break;
+            case 4:
+                Listar(pBuffer);
+                break;
+            case 5:
+                free(pBuffer);
+                _CrtDumpMemoryLeaks();
+                exit(0);
+                break;
+        }
+    }
+}
+
+void Adicionar(void *pBuffer) {
+    printf("--Digite o nome: ");
+    scanf("%s", (char *)pBuffer+22+(TAM_PESSOA*((*((int *)pBuffer+1))-1)));
+    printf("--Digite a idade: ");
+    scanf("%d", (int *)((char*)pBuffer+32+(TAM_PESSOA*((*((int *)pBuffer+1))-1))));
+    printf("--Digite o email: ");
+    scanf("%s", (char *)pBuffer+36+(TAM_PESSOA*((*((int *)pBuffer+1))-1)));
+}
+
+void Listar(void *pBuffer) {
+    for ( *(int *)pBuffer = 0; *(int *)pBuffer < *((int *)pBuffer+1); (*(int *)pBuffer)++ ) {
+        printf("\n--Pessoa %d\n", (*(int *)pBuffer)+1);
+        printf("%s\n", (char *)pBuffer+22+(TAM_PESSOA*(*(int *)pBuffer)));
+        printf("%d\n", *(int *)((char*)pBuffer+32+(TAM_PESSOA*(*(int *)pBuffer))));
+        printf("%s\n", (char *)pBuffer+36+(TAM_PESSOA*(*(int *)pBuffer)));
+    }
+    printf("\n");
+}
