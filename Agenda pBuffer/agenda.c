@@ -5,9 +5,11 @@
 
 //pessoa = char nome[10], int idade, char email[20];
 #define TAM_PESSOA (sizeof(char)*10 + sizeof(int) + sizeof(char)*20)
+#define HEADER (sizeof(int)*3 + sizeof(char)*10)
 
 void Adicionar(void *pBuffer);
 void Listar(void *pBuffer);
+void Buscar(void *pBuffer);
 
 int main() {
     void *pBuffer, *temp;
@@ -45,7 +47,7 @@ int main() {
 
                 break;
             case 3:
-
+                Buscar(pBuffer);
                 break;
             case 4:
                 Listar(pBuffer);
@@ -61,20 +63,40 @@ int main() {
 
 void Adicionar(void *pBuffer) {
     printf("--Digite o nome: ");
-    scanf("%9s", (char *) pBuffer + 22 + (TAM_PESSOA * ((*((int *)pBuffer+1)) - 1)));
+    scanf("%9s", (char *) pBuffer + HEADER + (TAM_PESSOA * ((*((int *)pBuffer+1)) - 1)));
     scanf("%*[^\n]%*c");
     printf("--Digite a idade: ");
-    scanf("%d", (int *)((char*) pBuffer + 32 + (TAM_PESSOA * ((*((int *)pBuffer+1)) - 1))));
+    scanf("%d", (int *)((char*) pBuffer + HEADER + 10 + (TAM_PESSOA * ((*((int *)pBuffer+1)) - 1))));
     printf("--Digite o email: ");
-    scanf("%19s", (char *) pBuffer + 36 + (TAM_PESSOA * ((*((int *)pBuffer+1)) - 1)));
+    scanf("%19s", (char *) pBuffer + HEADER + sizeof(int) + 10 + (TAM_PESSOA * ((*((int *)pBuffer+1)) - 1)));
     scanf("%*[^\n]%*c");
 }
 
 void Listar(void *pBuffer) {
     for ( *(int *)pBuffer = 0; *(int *)pBuffer < *((int *)pBuffer+1); (*(int *)pBuffer)++ ) {
         printf("\n--Pessoa %d\n", (*(int *)pBuffer) + 1);
-        printf("%s\n", (char *) pBuffer + 22 + (TAM_PESSOA * (*(int *)pBuffer)));
-        printf("%d\n", *(int *)((char*) pBuffer + 32 + (TAM_PESSOA * (*(int *)pBuffer))));
-        printf("%s\n", (char *) pBuffer + 36 + (TAM_PESSOA * (*(int *)pBuffer)));
+        printf("%s\n", (char *) pBuffer + HEADER + (TAM_PESSOA * (*(int *)pBuffer)));
+        printf("%d\n", *(int *)((char*) pBuffer + HEADER + 10 + (TAM_PESSOA * (*(int *)pBuffer))));
+        printf("%s\n", (char *) pBuffer + HEADER + sizeof(int) + 10 + (TAM_PESSOA * (*(int *)pBuffer)));
+    }
+}
+
+void Buscar(void *pBuffer) {
+    printf("--Digite o nome: ");
+    scanf("%9s", (char *) pBuffer + sizeof(int) * 3);
+    scanf("%*[^\n]%*c");
+
+    for ( *(int *)pBuffer = 0; *(int *)pBuffer < *((int *)pBuffer+1); (*(int *)pBuffer)++ ) {
+        if ( strcmp((char *) pBuffer + sizeof(int) * 3, (char *) pBuffer + HEADER + (TAM_PESSOA * (*(int *)pBuffer))) == 0 ) {
+            printf("\n--Pessoa %d\n", (*(int *)pBuffer) + 1);
+            printf("%s\n", (char *) pBuffer + HEADER + (TAM_PESSOA * (*(int *)pBuffer)));
+            printf("%d\n", *(int *)((char*) pBuffer + HEADER + 10 + (TAM_PESSOA * (*(int *)pBuffer))));
+            printf("%s\n", (char *) pBuffer + HEADER + sizeof(int) + 10 + (TAM_PESSOA * (*(int *)pBuffer)));
+            break;
+        }
+    }
+
+    if ( *(int *)pBuffer == *((int *)pBuffer+1) ) {
+        printf("Nome nao encontrado\n");
     }
 }
