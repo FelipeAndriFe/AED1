@@ -23,7 +23,7 @@ int main() {
     printf("--AGENDA PBUFFER MENU--\n");
     for( ;; ) {
         do {
-            printf("1. Adicionar pessoa\n");
+            printf("\n1. Adicionar pessoa\n");
             printf("2. Remover pessoa\n");
             printf("3. Buscar pessoa\n");
             printf("4. Listar todas\n");
@@ -61,19 +61,20 @@ int main() {
 
 void Adicionar(void *pBuffer) {
     printf("--Digite o nome: ");
-    scanf("%s", (char *)pBuffer+22+(TAM_PESSOA*((*((int *)pBuffer+1))-1)));
+    scanf("%9s", (char *) pBuffer + 22 + (TAM_PESSOA * ((*((int *)pBuffer+1)) - 1)));
+    scanf("%*[^\n]%*c");
     printf("--Digite a idade: ");
-    scanf("%d", (int *)((char*)pBuffer+32+(TAM_PESSOA*((*((int *)pBuffer+1))-1))));
+    scanf("%d", (int *)((char*) pBuffer + 32 + (TAM_PESSOA * ((*((int *)pBuffer+1)) - 1))));
     printf("--Digite o email: ");
-    scanf("%s", (char *)pBuffer+36+(TAM_PESSOA*((*((int *)pBuffer+1))-1)));
+    scanf("%19s", (char *) pBuffer + 36 + (TAM_PESSOA * ((*((int *)pBuffer+1)) - 1)));
+    scanf("%*[^\n]%*c");
 }
 
 void Listar(void *pBuffer) {
     for ( *(int *)pBuffer = 0; *(int *)pBuffer < *((int *)pBuffer+1); (*(int *)pBuffer)++ ) {
-        printf("\n--Pessoa %d\n", (*(int *)pBuffer)+1);
-        printf("%s\n", (char *)pBuffer+22+(TAM_PESSOA*(*(int *)pBuffer)));
-        printf("%d\n", *(int *)((char*)pBuffer+32+(TAM_PESSOA*(*(int *)pBuffer))));
-        printf("%s\n", (char *)pBuffer+36+(TAM_PESSOA*(*(int *)pBuffer)));
+        printf("\n--Pessoa %d\n", (*(int *)pBuffer) + 1);
+        printf("%s\n", (char *) pBuffer + 22 + (TAM_PESSOA * (*(int *)pBuffer)));
+        printf("%d\n", *(int *)((char*) pBuffer + 32 + (TAM_PESSOA * (*(int *)pBuffer))));
+        printf("%s\n", (char *) pBuffer + 36 + (TAM_PESSOA * (*(int *)pBuffer)));
     }
-    printf("\n");
 }
