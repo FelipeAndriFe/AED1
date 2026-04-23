@@ -10,6 +10,7 @@
 void Adicionar(void *pBuffer);
 void Listar(void *pBuffer);
 void Buscar(void *pBuffer);
+void Remover(void *pBuffer);
 
 int main() {
     void *pBuffer, *temp;
@@ -44,7 +45,12 @@ int main() {
                 Adicionar(pBuffer);
                 break;
             case 2:
-
+                Remover(pBuffer);
+                temp = realloc(pBuffer, sizeof(int)*3 + sizeof(char)*10 + TAM_PESSOA*(*((int *)pBuffer+1)));
+                if ( !temp ) {
+                    exit(1);
+                } 
+                pBuffer = temp;
                 break;
             case 3:
                 Buscar(pBuffer);
@@ -70,6 +76,7 @@ void Adicionar(void *pBuffer) {
     printf("--Digite o email: ");
     scanf("%19s", (char *) pBuffer + HEADER + sizeof(int) + 10 + (TAM_PESSOA * ((*((int *)pBuffer+1)) - 1)));
     scanf("%*[^\n]%*c");
+    printf("Nome adicionado\n");
 }
 
 void Listar(void *pBuffer) {
@@ -98,5 +105,31 @@ void Buscar(void *pBuffer) {
 
     if ( *(int *)pBuffer == *((int *)pBuffer+1) ) {
         printf("Nome nao encontrado\n");
+    }
+}
+
+void Remover(void *pBuffer) {
+    printf("--Digite o nome: ");
+    scanf("%9s", (char *) pBuffer + sizeof(int) * 3);
+    scanf("%*[^\n]%*c");
+
+    for ( *(int *)pBuffer = 0; *(int *)pBuffer < *((int *)pBuffer+1); (*(int *)pBuffer)++ ) {
+        if ( strcmp((char *) pBuffer + sizeof(int) * 3, (char *) pBuffer + HEADER + (TAM_PESSOA * (*(int *)pBuffer))) == 0 ) {
+            if ( *(int *)pBuffer == (*((int *)pBuffer+1)) - 1 ) {
+                break;
+            } else {
+                memmove((char *) pBuffer + HEADER + (TAM_PESSOA * (*(int *)pBuffer)), 
+                        (char *) pBuffer + HEADER + (TAM_PESSOA * ((*(int *)pBuffer) + 1)),
+                        TAM_PESSOA * (((*((int *)pBuffer+1)) - 1) - *(int *)pBuffer));
+                break;
+            }
+        }
+    }
+
+    if ( *(int *)pBuffer == *((int *)pBuffer+1) ) {
+        printf("Nome nao encontrado\n");
+    } else {
+        (*((int *)pBuffer+1))--;
+        printf("Nome removido\n");
     }
 }
