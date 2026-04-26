@@ -14,7 +14,7 @@ int* FindDiagonalOrder( int** mat, int matSize, int* matColSize, int* returnSize
     diagonals = ( matSize + ( *matColSize ) ) - 1;
     *returnSize = ( matSize * ( *matColSize ) );
 
-    result = ( int * )malloc( sizeof( int ) * ( matSize * ( *matColSize ) ) );
+    result = ( int * ) malloc ( sizeof( int ) * ( matSize * ( *matColSize ) ) );
     if ( !result ) {
         return NULL;
     }
