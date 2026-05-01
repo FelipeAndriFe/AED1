@@ -51,7 +51,10 @@ stack_t *Create( int cap ) {
     if ( !stack ) return NULL;
 
     stack->items = (int *) malloc ( sizeof( int ) * cap );
-    if ( !stack->items ) return NULL;
+    if ( !stack->items ) {
+        free(stack);
+        return NULL;
+    }
 
     stack->size = 0;
     stack->cap = cap;
