@@ -12,5 +12,5 @@ O problema:
 
 Implementação:
 
-
-Restrições do código:
+- No início do pBuffer é alocado um HEADER, composto de um int i (contador), um int qnt (quantidade de pessoas), um int menu (usado na escolha da operação), e um char alvo[10] (usado nas funções de busca e remoção).
+- As pessoas são alocadas sequencialmente após o HEADER. Cada pessoa ocupa 10 char (nome) + 1 int (idade) + 20 char (email).
