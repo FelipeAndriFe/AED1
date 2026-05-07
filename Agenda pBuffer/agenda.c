@@ -127,7 +127,7 @@ void Remover( void *pBuffer ) {
         printf( "Agenda Vazia\n" );
         return;
     }
-    
+
     printf( "--Digite o nome: " );
     scanf( "%9s", ALVO );
     scanf( "%*[^\n]%*c" );
