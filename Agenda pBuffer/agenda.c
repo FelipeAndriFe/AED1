@@ -84,6 +84,11 @@ void Adicionar( void *pBuffer ) {
 }
 
 void Listar( void *pBuffer ) {
+    if ( *QNT == 0 ) {
+        printf( "Agenda Vazia\n" );
+        return;
+    }
+
     for ( *I = 0; *I < *QNT; (*I)++ ) {
         printf( "\n--Pessoa %d\n", (*I) + 1 );
         printf( "%s\n", (char *) pBuffer + HEADER + ( TAM_PESSOA * (*I) ) );
@@ -93,6 +98,11 @@ void Listar( void *pBuffer ) {
 }
 
 void Buscar( void *pBuffer ) {
+    if ( *QNT == 0 ) {
+        printf( "Agenda Vazia\n" );
+        return;
+    }
+
     printf( "--Digite o nome: " );
     scanf( "%9s", ALVO );
     scanf( "%*[^\n]%*c" );
@@ -113,6 +123,11 @@ void Buscar( void *pBuffer ) {
 }
 
 void Remover( void *pBuffer ) {
+    if ( *QNT == 0 ) {
+        printf( "Agenda Vazia\n" );
+        return;
+    }
+    
     printf( "--Digite o nome: " );
     scanf( "%9s", ALVO );
     scanf( "%*[^\n]%*c" );
