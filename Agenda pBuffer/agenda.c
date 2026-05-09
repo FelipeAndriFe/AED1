@@ -3,29 +3,36 @@
 #include <string.h>
 #include <crtdbg.h>
 
-//pessoa = char nome[10], int idade, char email[20];
-#define TAM_PESSOA ( sizeof(char) * 10 + sizeof(int) + sizeof(char) * 20 )
-#define HEADER ( sizeof(int) * 3 + sizeof(char) * 10 )
+#define HEADER ( sizeof( int ) * 5 + sizeof( char ) * 256 )
 #define I ( (int *) pBuffer )
+#define I2 ( (int *) *pBuffer )
 #define QNT ( (int *) pBuffer + 1 )
+#define QNT2 ( (int *) *pBuffer + 1 )
 #define MENU ( (int *) pBuffer + 2 )
-#define ALVO ( (char *) pBuffer + (sizeof(int) * 3) )
+#define MENU2 ( (int *) *pBuffer + 2 )
+#define TAMANHO ( (int *) pBuffer + 3 )
+#define TAMANHO2 ( (int *) *pBuffer + 3 )
+#define OFFSET ( (int *) pBuffer + 4 )
+#define OFFSET2 ( (int *) *pBuffer + 4 )
+#define TEMP ( (char *) pBuffer + ( sizeof( int ) * 5 ) )
+#define TEMP2 ( (char *) *pBuffer + ( sizeof( int ) * 5 ) )
 
-void Adicionar( void *pBuffer );
+void Adicionar( void **pBuffer );
 void Listar( void *pBuffer );
 void Buscar( void *pBuffer );
-void Remover( void *pBuffer );
+void Remover( void **pBuffer );
 
 int main() {
-    void *pBuffer, *temp;
+    void *pBuffer;
     
-    //pBuffer = int i, int qnt, int menu, char alvo[10]
+    //pBuffer = int i, int qnt, int menu, int tamanho, int offset, char temp[256]
     pBuffer = malloc( HEADER );
     if ( !pBuffer ) {
         exit(1);
     }
 
     *QNT = 0;
+    *TAMANHO = (int) HEADER;
 
     printf( "--AGENDA PBUFFER MENU--\n" );
     for( ;; ) {
@@ -40,21 +47,10 @@ int main() {
 
         switch( *MENU ) {
             case 1:
-                (*QNT)++;
-                temp = realloc( pBuffer, HEADER + TAM_PESSOA * (*QNT) );
-                if ( !temp ) {
-                    exit(1);
-                } 
-                pBuffer = temp;
-                Adicionar( pBuffer );
+                Adicionar( &pBuffer );
                 break;
             case 2:
-                Remover( pBuffer );
-                temp = realloc( pBuffer, HEADER + TAM_PESSOA * (*QNT) );
-                if ( !temp ) {
-                    exit(1);
-                } 
-                pBuffer = temp;
+                Remover( &pBuffer );
                 break;
             case 3:
                 Buscar( pBuffer );
@@ -71,16 +67,49 @@ int main() {
     }
 }
 
-void Adicionar( void *pBuffer ) {
+void Adicionar( void **pBuffer ) {
+    void *temp;
+
     printf( "--Digite o nome: " );
-    scanf( "%9s", (char *) pBuffer + HEADER + ( TAM_PESSOA * ( (*QNT) - 1) ) );
-    scanf( "%*[^\n]%*c" );
+    scanf( "%255s", TEMP2 );
+    *I2 = (int) strlen( TEMP2 ) + 1;
+
+    temp = realloc( *pBuffer, *TAMANHO2 + sizeof( int ) * 2 + *I2 );
+    if ( !temp ) {
+        printf( "Falha ao Adicionar\n " );
+        return;
+    }
+    *pBuffer = temp;
+
+    *OFFSET2 = *TAMANHO2; 
+    *(int *)( (char *)*pBuffer + *OFFSET2 ) = (int) sizeof( int ) + *I2;
+    
+    strcpy( (char *)*pBuffer + *OFFSET2 + sizeof( int ), TEMP2 );
+    *TAMANHO2 += (int) sizeof( int ) * 2 + *I2;
+
     printf( "--Digite a idade: " );
-    scanf( "%d", (int *)( (char *) pBuffer + HEADER + 10 + ( TAM_PESSOA * ( (*QNT) - 1) ) ) );
+    scanf( "%d", (int *) ( (char *)*pBuffer + *OFFSET2 + *(int *)( (char *)*pBuffer + *OFFSET2 ) ) );
+
+    *(int *) ( (char *)*pBuffer + *OFFSET2 ) += (int) sizeof( int );
+
     printf( "--Digite o email: " );
-    scanf( "%19s", (char *) pBuffer + HEADER + sizeof(int) + 10 + ( TAM_PESSOA * ( (*QNT) - 1 ) ) );
-    scanf( "%*[^\n]%*c" );
-    printf( "Nome adicionado\n" );
+    scanf( "%255s", TEMP2 );
+
+    *I2 = (int) strlen( TEMP2 ) + 1;
+
+    temp = realloc( *pBuffer, *TAMANHO2 + *I2 );
+    if ( !temp ) {
+        printf( "Falha ao Adicionar\n " );
+        return;
+    }
+    *pBuffer = temp;
+
+    strcpy( (char *)*pBuffer + *OFFSET2 + *(int *) ( (char *) *pBuffer + *OFFSET2 ), TEMP2 );
+    *(int *) ( (char *) *pBuffer + *OFFSET2 ) += *I2;
+    *TAMANHO2 += *I2;
+    *QNT2 += 1;
+
+    printf( "Nome Adicionado\n" );
 }
 
 void Listar( void *pBuffer ) {
@@ -89,11 +118,15 @@ void Listar( void *pBuffer ) {
         return;
     }
 
+    *OFFSET = (int) HEADER;
+
     for ( *I = 0; *I < *QNT; (*I)++ ) {
         printf( "\n--Pessoa %d\n", (*I) + 1 );
-        printf( "%s\n", (char *) pBuffer + HEADER + ( TAM_PESSOA * (*I) ) );
-        printf( "%d\n", *(int *)( (char*) pBuffer + HEADER + 10 + ( TAM_PESSOA * (*I) ) ) );
-        printf( "%s\n", (char *) pBuffer + HEADER + sizeof(int) + 10 + ( TAM_PESSOA * (*I) ) );
+        printf( "%s\n", (char *) pBuffer + *OFFSET + sizeof( int ) );
+        printf( "%d\n", *(int *) ( (char*) pBuffer + *OFFSET + sizeof( int ) + strlen( (char *) pBuffer + *OFFSET + sizeof( int ) ) + 1 ) );
+        printf( "%s\n", (char *) pBuffer + *OFFSET + sizeof( int ) * 2 + strlen( (char *) pBuffer + *OFFSET + sizeof( int ) ) + 1 );
+
+        *OFFSET += *(int *) ( (char *) pBuffer + *OFFSET );
     }
 }
 
@@ -104,17 +137,20 @@ void Buscar( void *pBuffer ) {
     }
 
     printf( "--Digite o nome: " );
-    scanf( "%9s", ALVO );
-    scanf( "%*[^\n]%*c" );
+    scanf( "%255s", TEMP );
+
+    *OFFSET = (int) HEADER;
 
     for ( *I = 0; *I < *QNT; (*I)++ ) {
-        if ( strcmp( ALVO, (char *) pBuffer + HEADER + ( TAM_PESSOA * (*I) ) ) == 0 ) {
-            printf( "\n--Pessoa %d\n", (*(int *)pBuffer) + 1 );
-            printf( "%s\n", (char *) pBuffer + HEADER + ( TAM_PESSOA * (*I) ) );
-            printf( "%d\n", *(int *)( (char*) pBuffer + HEADER + 10 + ( TAM_PESSOA * (*I) ) ) );
-            printf( "%s\n", (char *) pBuffer + HEADER + sizeof(int) + 10 + ( TAM_PESSOA * (*I) ) );
+        if ( strcmp( TEMP, (char *) pBuffer + *OFFSET + sizeof( int ) ) == 0 ) {
+            printf( "\n--Pessoa %d\n", (*I) + 1 );
+            printf( "%s\n", (char *) pBuffer + *OFFSET + sizeof( int ) );
+            printf( "%d\n", *(int *) ( (char*) pBuffer + *OFFSET + sizeof( int ) + strlen( (char *) pBuffer + *OFFSET + sizeof( int ) ) + 1 ) );
+            printf( "%s\n", (char *) pBuffer + *OFFSET + sizeof( int ) * 2 + strlen( (char *) pBuffer + *OFFSET + sizeof( int ) ) + 1 );
             break;
         }
+
+        *OFFSET += *(int *) ( (char *) pBuffer + *OFFSET );
     }
 
     if ( *I == *QNT ) {
@@ -122,33 +158,52 @@ void Buscar( void *pBuffer ) {
     }
 }
 
-void Remover( void *pBuffer ) {
-    if ( *QNT == 0 ) {
+void Remover( void **pBuffer ) {
+    void *temp;
+
+    if ( *QNT2 == 0 ) {
         printf( "Agenda Vazia\n" );
         return;
     }
 
     printf( "--Digite o nome: " );
-    scanf( "%9s", ALVO );
-    scanf( "%*[^\n]%*c" );
+    scanf( "%255s", TEMP2 );
+    
+    *OFFSET2 = (int) HEADER;
 
-    for ( *I = 0; *I < *QNT; (*I)++ ) {
-        if ( strcmp( ALVO, (char *) pBuffer + HEADER + ( TAM_PESSOA * (*I) ) ) == 0 ) {
-            if ( *I == (*QNT) - 1 ) {
-                break;
+    for ( *I2 = 0; *I2 < *QNT2; (*I2)++ ) {
+        if ( strcmp( TEMP2, (char *) *pBuffer + *OFFSET2 + sizeof( int ) ) == 0 ) {
+            if ( *I2 < ( *QNT2 - 1 ) ) {
+                *MENU2 = *(int *) ( (char *) *pBuffer + *OFFSET2 );
+                *I2 = *OFFSET2;
+                while ( *I2 < *TAMANHO2 ) {
+                    *I2 += *(int *) ( (char *) *pBuffer + *I2 );
+                }
+
+                memmove( (char *) *pBuffer + *OFFSET2,
+                         (char *) *pBuffer + *OFFSET2 + *MENU2,
+                         *I2 - ( *MENU2 + *OFFSET2 ) );
+
+                *TAMANHO2 -= *MENU2;
             } else {
-                memmove( (char *) pBuffer + HEADER + ( TAM_PESSOA * (*I) ), 
-                        (char *) pBuffer + HEADER + ( TAM_PESSOA * ( (*I) + 1 ) ),
-                        TAM_PESSOA * ( ( (*QNT) - 1 ) - *I ) );
-                break;
+                *TAMANHO2 -= *(int *) ( (char *) *pBuffer + *OFFSET2 );
             }
+            break;
         }
+
+        *OFFSET2 += *(int *) ( (char *) *pBuffer + *OFFSET2 );
     }
 
-    if ( *I == *QNT ) {
+    if ( *I2 == *QNT2 ) {
         printf( "Nome nao encontrado\n" );
     } else {
-        (*QNT)--;
-        printf( "Nome removido\n" );
+        temp = realloc( *pBuffer, *TAMANHO2 );
+        if ( !temp ) {
+            printf( "Falha ao Remover\n" );
+            return;
+        }
+        *pBuffer = temp;
+        (*QNT2)--;
+        printf( "Nome Removido\n" );
     }
 }
