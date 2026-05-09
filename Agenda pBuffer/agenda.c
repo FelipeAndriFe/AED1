@@ -175,14 +175,10 @@ void Remover( void **pBuffer ) {
         if ( strcmp( TEMP2, (char *) *pBuffer + *OFFSET2 + sizeof( int ) ) == 0 ) {
             if ( *I2 < ( *QNT2 - 1 ) ) {
                 *MENU2 = *(int *) ( (char *) *pBuffer + *OFFSET2 );
-                *I2 = *OFFSET2;
-                while ( *I2 < *TAMANHO2 ) {
-                    *I2 += *(int *) ( (char *) *pBuffer + *I2 );
-                }
 
                 memmove( (char *) *pBuffer + *OFFSET2,
                          (char *) *pBuffer + *OFFSET2 + *MENU2,
-                         *I2 - ( *MENU2 + *OFFSET2 ) );
+                         *TAMANHO2 - ( *MENU2 + *OFFSET2 ) );
 
                 *TAMANHO2 -= *MENU2;
             } else {
@@ -190,7 +186,6 @@ void Remover( void **pBuffer ) {
             }
             break;
         }
-
         *OFFSET2 += *(int *) ( (char *) *pBuffer + *OFFSET2 );
     }
 
