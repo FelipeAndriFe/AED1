@@ -6,25 +6,14 @@ void MergeSort(int *array, int low, int high);
 void Merge(int *array, int low, int mid, int high);
 
 int main() {
-    int *array = (int *)malloc(sizeof(int) * 10);
-    array[0] = 12;
-    array[1] = 1;
-    array[2] = 24;
-    array[3] = 6;
-    array[4] = 9;
-    array[5] = 34;
-    array[6] = -2;
-    array[7] = 0;
-    array[8] = 11;
-    array[9] = 40;
+    int array[] = {12, 30, 1, 0, -12, 38, 72, 45, 12, 32, 19, 2, -3};
 
-    MergeSort(array, 0, 9);
+    MergeSort(array, 0, 12);
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 13; i++) {
         printf("%d ", array[i]);
     }
 
-    free(array);
     _CrtDumpMemoryLeaks();
     return 0;
 }
