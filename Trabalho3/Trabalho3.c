@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <crtdbg.h>
 
 typedef struct no_s {
 	int					valor;
@@ -204,4 +205,111 @@ bool isIdealPermutation( int* nums, int numsSize ) {
 
 	Liberar_r( root );
 	return global == local;
+}
+
+/*
+====================
+ForcaBruta
+
+	Referencia O( n^2 ) usada para conferir os resultados dos testes.
+====================
+*/
+static bool ForcaBruta( const int *nums, int n ) {
+	long long	global;
+	long long	local;
+	int			i;
+	int			j;
+
+	global = 0;
+	for ( i = 0; i < n; i++ ) {
+		for ( j = i + 1; j < n; j++ ) {
+			if ( nums[i] > nums[j] ) {
+				global++;
+			}
+		}
+	}
+
+	local = 0;
+	for ( i = 0; i + 1 < n; i++ ) {
+		if ( nums[i] > nums[i + 1] ) {
+			local++;
+		}
+	}
+
+	return global == local;
+}
+
+/*
+====================
+ImprimirArray
+====================
+*/
+static void ImprimirArray( const int *a, int n ) {
+	int		i;
+
+	printf( "[" );
+	for ( i = 0; i < n; i++ ) {
+		printf( "%d%s", a[i], i + 1 < n ? "," : "" );
+	}
+	printf( "]" );
+}
+
+/*
+====================
+RodarTeste
+====================
+*/
+static int RodarTeste( int num, int *nums, int n, bool esperado ) {
+	bool	obtido;
+	bool	bruto;
+	int		ok;
+
+	obtido = isIdealPermutation( nums, n );
+	bruto = ForcaBruta( nums, n );
+	ok = ( obtido == esperado ) && ( bruto == esperado );
+
+	printf( "Teste %2d: nums = ", num );
+	ImprimirArray( nums, n );
+	printf( "\n  esperado = %s | avl = %s | forca bruta = %s  ->  %s\n\n",
+			esperado ? "true" : "false",
+			obtido ? "true" : "false",
+			bruto ? "true" : "false",
+			ok ? "OK" : "FALHOU" );
+	return ok;
+}
+
+/*
+====================
+main
+====================
+*/
+int main( void ) {
+	int		passou;
+
+	int		t1[]  = { 1, 0, 2 };				/* exemplo 1 do enunciado             */
+	int		t2[]  = { 1, 2, 0 };				/* exemplo 2 do enunciado             */
+	int		t3[]  = { 0 };						/* elemento unico                     */
+	int		t4[]  = { 0, 1, 2, 3, 4 };			/* identidade: zero inversoes         */
+	int		t5[]  = { 1, 0, 3, 2, 4 };			/* trocas adjacentes disjuntas        */
+	int		t6[]  = { 2, 0, 1 };				/* valor a 2 posicoes do lugar        */
+	int		t7[]  = { 4, 3, 2, 1, 0 };			/* permutacao reversa                 */
+	int		t8[]  = { 0, 2, 1 };				/* uma troca adjacente no fim         */
+	int		t9[]  = { 1, 0, 2, 4, 3 };			/* trocas nas duas pontas             */
+	int		t10[] = { 3, 0, 1, 2 };				/* 3 globais, 1 local                 */
+
+	passou = 0;
+	passou += RodarTeste(  1, t1,  3, true );
+	passou += RodarTeste(  2, t2,  3, false );
+	passou += RodarTeste(  3, t3,  1, true );
+	passou += RodarTeste(  4, t4,  5, true );
+	passou += RodarTeste(  5, t5,  5, true );
+	passou += RodarTeste(  6, t6,  3, false );
+	passou += RodarTeste(  7, t7,  5, false );
+	passou += RodarTeste(  8, t8,  3, true );
+	passou += RodarTeste(  9, t9,  5, true );
+	passou += RodarTeste( 10, t10, 4, false );
+
+	printf( "Resultado final: %d/10 testes passaram\n", passou );
+	_CrtDumpMemoryLeaks();
+	return passou == 10 ? 0 : 1;
 }
